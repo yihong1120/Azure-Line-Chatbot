@@ -44,7 +44,7 @@ After setting up, simply interact with the bot using the LINE application. Your 
 
 ## Contributions
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yihong1120/Azure-Line-Chatbot.git/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yihong1120/Azure-Line-Chatbot/issues).
 
 ## License
 
