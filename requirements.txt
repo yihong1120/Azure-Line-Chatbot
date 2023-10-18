@@ -1,0 +1,6 @@
+Flask==2.0.1
+openai==0.27.0
+pyodbc==4.0.32
+azure-appconfiguration==2.0.0
+azure-storage-blob==12.9.0
+line-bot-sdk==2.0.1
