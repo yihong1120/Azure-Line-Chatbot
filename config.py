@@ -1,6 +1,7 @@
 import os
 from azure.appconfiguration import AzureAppConfigurationClient
 import logging
+from typing import Union
 
 class AppConfig:
     def __init__(self) -> None:
