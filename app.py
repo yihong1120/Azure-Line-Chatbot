@@ -4,7 +4,12 @@ from chatbot import ChatAssistant
 from logger import AzureBlobLogger
 import logging
 
-def main():
+def main() -> None:
+    """
+    Main function to initialise and run the chatbot application. 
+    This sets up logging with Azure Blob storage, initialises the chatbot components, 
+    and runs the Flask application.
+    """
     try:
         # Setup Azure Blob logger
         azure_logger = AzureBlobLogger()
@@ -16,7 +21,7 @@ def main():
         # Log a message to Azure Blob storage when the application starts
         logger.info("Application started.")
 
-        # Initialize Chatbot components
+        # Initialise Chatbot components
         database = AzureDatabase()
         chat_assistant = ChatAssistant(database)
         line_bot = LineBot(app, chat_assistant)

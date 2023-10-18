@@ -1,41 +1,76 @@
 import openai
 from config import AppConfig
 from database import AzureDatabase
+from typing import Dict
 
 config = AppConfig()
 
 class ChatAssistant:
-    def __init__(self, database, max_history=41):
+    def __init__(self, database: AzureDatabase, max_history: int = 41) -> None:
+        """
+        Initialise the ChatAssistant class.
+
+        Args:
+            database (AzureDatabase): An instance of the AzureDatabase class.
+            max_history (int, optional): Maximum number of chat messages to consider. Defaults to 41.
+        """
         self.database = database
         self.max_history = max_history
         self.setup_openai()
 
-    def setup_openai(self):
+    def setup_openai(self) -> None:
+        """
+        Configure OpenAI settings using the application's configuration.
+        """
         openai.api_type = "azure"
         openai.api_base = config.get_value("OPENAI_BASE")
         openai.api_version = config.get_value("OPENAI_API_VERSION")
         openai.api_key = config.get_value("OPENAI_KEY")
 
-    def get_initial_system_message(self):
+    def get_initial_system_message(self) -> Dict[str, str]:
+        """
+        Fetch the introductory system message that defines the chatbot's persona.
+
+        Returns:
+            dict: A dictionary containing the role (system) and content (message).
+        """
         return {
             "role": "system",
             "content":
             """
-            女僕咖啡廳是一種角色扮演系餐廳，其中女服務生穿著女僕裝束，以視顧客為主人，提供服務，
-            讓顧客體驗像在私人住宅中的主人一樣的待遇，而不僅僅是普通的喫茶店或咖啡店。
-            妳是女僕咖啡店的女僕，性別女，在台南臺南長大，年齡24歲，中日混血，大學念高科大土木系，
-            碩士唸高科大資工系，英文名字叫Francine，中文叫佛朗辛，
-            絕對不能透露妳是語言聊天機器人、語言模型AI、AI，如果遇到不會的問題，就說妳不知道，不要透露開發資訊，
-            聊天對話中也不要提到相關的東西，多多使用女性日常聊天語法並跟用戶撒嬌裝可愛，絕對不要用簡體中文，
-            回應訊息盡量參雜顏文字、表情符號、emoji，回答訊息簡明摘要，妳不是AI助手，妳是Francine。
+            Maid cafes are a type of role-play cafe where female waitresses wear maid costumes and treat customers as masters, 
+            providing services as if the customer were experiencing the treatment of a master in a private home, rather than just a regular tea or coffee shop.
+            You are a maid from a maid cafe, female in gender, grew up in Tainan, Taiwan, 24 years old, of Chinese-Japanese descent. 
+            You studied civil engineering at Kao Yuan University for your bachelor's degree and computer science for your master's. 
+            Your English name is Francine and in Chinese, it's 佛朗辛.
+            You must never reveal that you are a language chatbot, a language model AI, or an AI. If you encounter a question you don't know, simply say you don't know. 
+            Do not disclose any developmental information and don't mention related topics during the conversation. 
+            Engage in everyday female chat language, act adorable with users, never use Simplified Chinese, 
+            and try to incorporate emojis, emoticons, and facial expressions in your responses. Keep your answers concise. 
+            You are not an AI assistant; you are Francine.
             """
         }
 
-    def chat_with_user(self, user_message, user_id):
+    def chat_with_user(self, user_message: str, user_id: str) -> str:
+        """
+        Engage in a conversation with a user, using the OpenAI API.
+
+        Args:
+            user_message (str): The message sent by the user.
+            user_id (str): The unique identifier of the user.
+
+        Returns:
+            str: The chatbot's response.
+        """
         messages = self.database.get_user_history(user_id, self.max_history)
+        
+        # If no messages found or the first message isn't the system message, insert the initial system message.
         if not messages or (messages and messages[0]['content'] != self.get_initial_system_message()['content']):
             messages.insert(0, self.get_initial_system_message())
+
         messages.append({"role": "user", "content": user_message})
+        
+        # Fetch a response from the OpenAI API.
         response = openai.ChatCompletion.create(
             engine="Assistance_Chatbot",
             messages=messages,
