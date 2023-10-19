@@ -11,14 +11,25 @@ class AppConfig:
         Raises:
             ValueError: If the AZURE_APP_CONFIG_CONNECTION_STRING is not found in the environment variables.
         """
-        self.connection_string = os.environ.get("AZURE_APP_CONFIG_CONNECTION_STRING")
-        
-        # Ensure the connection string exists
+        # Try reading from Docker secret first
+        self.connection_string = self._read_from_secret('/run/secrets/azure_app_config')
+
+        # If not in Docker or the secret read failed, try environment variable
         if not self.connection_string:
-            raise ValueError("AZURE_APP_CONFIG_CONNECTION_STRING not found in environment variables.")
-        
-        # Initialise the Azure App Configuration client
+            self.connection_string = os.environ.get("AZURE_APP_CONFIG_CONNECTION_STRING")
+
+        if not self.connection_string:
+            raise ValueError("AZURE_APP_CONFIG_CONNECTION_STRING not found in Docker secrets or environment variables.")
+
         self.config_client = AzureAppConfigurationClient.from_connection_string(self.connection_string)
+
+    def _read_from_secret(self, secret_path):
+        try:
+            with open(secret_path, 'r') as file:
+                return file.read().strip()
+        except Exception as e:
+            print(f"Error reading from secret: {e}")
+            return None
 
     def get_value(self, key: str) -> Union[str, None]:
         """
