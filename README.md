@@ -38,6 +38,18 @@ Azure-Line-Chatbot is crafted to bring a seamless user experience, providing mea
    python app.py
    ```
 
+## For Docker environment
+
+Execute the shell script: setup_docker_chatbot.sh
+   ```
+   bash setup_docker_chatbot.sh
+   ```
+
+When you are done, you can stop the container and remove it using:
+   ```
+   docker-compose down
+   ```
+
 ## Usage
 
 After setting up, simply interact with the bot using the LINE application. Your messages will be processed by the OpenAI model, and you'll receive a response in real-time.

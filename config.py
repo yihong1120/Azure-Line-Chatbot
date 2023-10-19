@@ -12,7 +12,7 @@ class AppConfig:
             ValueError: If the AZURE_APP_CONFIG_CONNECTION_STRING is not found in the environment variables.
         """
         # Try reading from Docker secret first.
-        self.connection_string = self._read_from_secret('/run/secrets/azure_app_config')
+        self.connection_string = self._read_from_secret('azure_app_config')
 
         # If not in Docker or the secret read failed, try environment variable.
         if not self.connection_string:
