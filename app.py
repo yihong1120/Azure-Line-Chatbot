@@ -27,7 +27,7 @@ def main() -> None:
         line_bot = LineBot(app, chat_assistant)
 
         # Run Flask application
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(host='127.0.0.1', port=5000)
     except Exception as e:
         logging.critical(f"Failed to start the application: {e}")
 
