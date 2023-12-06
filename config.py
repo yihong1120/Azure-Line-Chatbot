@@ -1,5 +1,7 @@
 import os
 from azure.appconfiguration import AzureAppConfigurationClient
+from requests.exceptions import RequestException
+from azure.core.exceptions import ResourceNotFoundError
 import logging
 from typing import Union, Optional
 
@@ -46,19 +48,25 @@ class AppConfig:
     def get_value(self, key: str) -> Union[str, None]:
         """
         Fetch a value from the Azure App Configuration using a given key.
-
+    
         Args:
             key (str): The key for which the value is to be fetched.
-
+    
         Returns:
             Union[str, None]: The corresponding value if found; otherwise, None.
-
+    
         Note:
             If an error occurs during the fetch, it logs the error and returns None.
         """
         try:
             fetched_key = self.config_client.get_configuration_setting(key=key)
             return fetched_key.value if fetched_key else None
-        except:
-            logging.error(f"Error fetching key {key} from Azure App Configuration")
+        except ResourceNotFoundError:
+            logging.error(f"Error fetching key {key} from Azure App Configuration, the key does not exist.")
+            return None
+        except RequestException:
+            logging.error(f"HTTP Request failed when fetching key {key} from Azure App Configuration.")
+            return None
+        except Exception as ex:
+            logging.error(f"An error occurred while fetching key {key} from Azure App Configuration: {str(ex)}")
             return None
