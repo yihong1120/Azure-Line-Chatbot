@@ -1,4 +1,5 @@
 from azure.storage.blob import BlobServiceClient
+from azure.core.exceptions import ResourceExistsError
 import datetime
 import logging
 from config import AppConfig
@@ -54,8 +55,10 @@ class AzureBlobHandler(logging.Handler):
         self._is_emitting: bool = False  # Guard against recursion
         try:
             self.blob_client.create_append_blob()
-        except:
-            pass
+        except ResourceExistsError as e:
+            print(f'Blob already exists: {e}')
+        except Exception as e:
+            print(f'An error occurred: {e}')
 
     def emit(self, record: logging.LogRecord) -> None:
         """
